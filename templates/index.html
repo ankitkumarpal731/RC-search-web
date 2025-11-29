@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RC Info Hub | ErAnkit</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --bg-dark: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-light: #f8f9fa;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                              radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                              radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+            color: var(--text-light);
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- Animations --- */
+        @keyframes slideInUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 5px var(--primary-color); }
+            50% { box-shadow: 0 0 20px var(--accent-color); }
+            100% { box-shadow: 0 0 5px var(--primary-color); }
+        }
+
+        /* --- Navbar & Branding --- */
+        .maker-badge {
+            background: linear-gradient(45deg, #ff00cc, #333399);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(255, 0, 204, 0.4);
+        }
+
+        .main-title {
+            font-weight: 800;
+            background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 3rem;
+            margin-bottom: 0;
+        }
+
+        .sub-text {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        /* --- Search Box --- */
+        .search-container {
+            backdrop-filter: blur(16px) saturate(180%);
+            background-color: var(--card-bg);
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.125);
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            margin-top: 30px;
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        .custom-input {
+            background: rgba(15, 23, 42, 0.8);
+            border: 2px solid #334155;
+            color: white;
+            border-radius: 50px;
+            padding: 15px 25px;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.3s;
+        }
+        
+        .custom-input:focus {
+            background: rgba(15, 23, 42, 1);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(72, 149, 239, 0.3);
+            color: white;
+            outline: none;
+        }
+
+        .btn-search {
+            border-radius: 50px;
+            background: linear-gradient(90deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            border: none;
+            padding: 15px 30px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: transform 0.2s;
+        }
+        
+        .btn-search:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(67, 97, 238, 0.6);
+        }
+
+        /* --- Results Section --- */
+        #resultArea {
+            display: none;
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        /* Number Plate Design */
+        .number-plate {
+            background: white;
+            color: black;
+            border: 4px solid black;
+            border-radius: 10px;
+            padding: 10px 20px;
+            display: inline-flex;
+            align-items: center;
+            font-family: 'Poppins', sans-serif; /* You can import a license plate font if needed */
+            font-weight: 900;
+            font-size: 2.5rem;
+            letter-spacing: 5px;
+            position: relative;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            text-transform: uppercase;
+        }
+        
+        .ind-strip {
+            width: 40px;
+            height: 100%;
+            background: linear-gradient(to bottom, #FF9933 0%, #FF9933 33%, #FFFFFF 33%, #FFFFFF 66%, #138808 66%, #138808 100%); /* Tricolor simulation is complex, simplified to blue usually on HSRP but let's do the Blue HSRP Strip */
+            background: #000080; /* Standard Blue Strip */
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 12px;
+            line-height: 1.2;
+        }
+        .ind-text { font-size: 14px; font-weight: bold; margin-top: 5px; color: white;}
+        .chakra { width: 15px; height: 15px; border-radius: 50%; border: 1px solid white; margin-bottom: 2px;}
+
+        /* Data Cards */
+        .info-card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 20px;
+            height: 100%;
+            transition: all 0.3s;
+        }
+        
+        .info-card:hover {
+            transform: translateY(-5px);
+            background: rgba(30, 41, 59, 0.9);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 2px; }
+        .value { font-size: 1.1rem; font-weight: 600; color: white; margin-bottom: 15px; text-shadow: 0 0 10px rgba(0,0,0,0.5); }
+
+        .status-active { color: #00e676; text-shadow: 0 0 10px rgba(0, 230, 118, 0.4); }
+        .status-inactive { color: #ff1744; }
+
+        /* Loader */
+        .loader-wrapper {
+            display: none;
+            text-align: center;
+            padding: 50px;
+        }
+        .scanning-line {
+            height: 4px;
+            width: 100%;
+            background: linear-gradient(90deg, transparent, #00f2fe, transparent);
+            animation: scan 1.5s infinite;
+        }
+        @keyframes scan {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 50px;
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            text-align: center;
+            color: #64748b;
+        }
+        .source-link { color: #4facfe; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container py-5">
+        
+        <div class="text-center mb-5">
+            <span class="maker-badge mb-3 d-inline-block"><i class="fas fa-code"></i> Developed by ErAnkit</span>
+            <h1 class="main-title mt-2">RC SEARCH X</h1>
+            <p class="sub-text">Advanced Vehicle Information System</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+                <div class="search-container text-center">
+                    <form id="rcForm" onsubmit="fetchData(event)">
+                        <div class="mb-4">
+                            <input type="text" id="vehicleNo" class="form-control custom-input text-center" placeholder="MH02AB1234" autocomplete="off" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-search w-100">
+                            <i class="fas fa-search me-2"></i> SEARCH VEHICLE
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="loading" class="loader-wrapper">
+            <div class="spinner-border text-info" role="status" style="width: 3rem; height: 3rem;"></div>
+            <h4 class="mt-3 text-light">Connecting to RTO Server...</h4>
+            <div class="mt-3" style="width: 200px; height: 4px; background: #333; margin: 0 auto; overflow: hidden; border-radius: 2px;">
+                <div class="scanning-line"></div>
+            </div>
+        </div>
+
+        <div id="resultArea" class="mt-5">
+            
+            <div class="text-center mb-5">
+                <div class="number-plate">
+                    <div class="ind-strip">
+                        <div class="chakra"></div>
+                        <span class="ind-text">IND</span>
+                    </div>
+                    <span id="vis_reg" style="padding-left: 45px;">MH02AB1234</span>
+                </div>
+                <h3 class="mt-3 text-white fw-bold" id="vis_model">Maruti Suzuki Swift</h3>
+                <span class="badge bg-secondary" id="vis_fuel">PETROL</span>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4">
+                    <div class="info-card">
+                        <i class="fas fa-user-circle card-icon"></i>
+                        <h4 class="mb-4 text-white border-bottom pb-2 border-secondary">Ownership</h4>
+                        
+                        <div class="mb-3">
+                            <div class="label">Owner Name</div>
+                            <div class="value" id="res_owner">--</div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="label">Father/Husband</div>
+                            <div class="value" id="res_father">--</div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="label">RTO Location</div>
+                            <div class="value" id="res_rto">--</div>
+                        </div>
+                        <div>
+                            <div class="label">Mobile</div>
+                            <div class="value" id="res_mobile">--</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="info-card">
+                        <i class="fas fa-car-side card-icon"></i>
+                        <h4 class="mb-4 text-white border-bottom pb-2 border-secondary">Specification</h4>
+                        
+                        <div class="mb-3">
+                            <div class="label">Maker</div>
+                            <div class="value" id="res_maker">--</div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="label">Color</div>
+                            <div class="value" id="res_color">--</div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="label">Engine CC / Cyl</div>
+                            <div class="value" id="res_engine">--</div>
+                        </div>
+                        <div>
+                            <div class="label">Category</div>
+                            <div class="value" id="res_category">--</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12 col-lg-4">
+                    <div class="info-card">
+                        <i class="fas fa-file-contract card-icon"></i>
+                        <h4 class="mb-4 text-white border-bottom pb-2 border-secondary">Validity & Status</h4>
+                        
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <div class="label">Registration Date</div>
+                                <div class="value" id="res_regdate">--</div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <div class="label">Current Status</div>
+                                <div class="value status-active" id="res_status">ACTIVE</div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <div class="label">Fitness Upto</div>
+                                <div class="value" id="res_fitness">--</div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <div class="label">Insurance Upto</div>
+                                <div class="value" id="res_insurance">--</div>
+                            </div>
+                            <div class="col-12">
+                                <div class="label">Estimated Price</div>
+                                <div class="value text-warning" id="res_price">--</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="info-card d-flex flex-wrap justify-content-between align-items-center">
+                        <div>
+                            <div class="label">Insurer Company</div>
+                            <div class="value mb-0" id="res_insurer">--</div>
+                        </div>
+                        <div class="text-end">
+                             <div class="label">Address</div>
+                            <div class="value mb-0" style="font-size: 0.9rem;" id="res_address">--</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2024 RC Search X. All rights reserved.</p>
+            <p class="small">Source: <span class="text-info fw-bold">Ehcoder</span> | UI by ErAnkit</p>
+        </div>
+
+    </div>
+
+    <script>
+        async function fetchData(e) {
+            e.preventDefault();
+            
+            const vehicleNo = document.getElementById('vehicleNo').value;
+            const loading = document.getElementById('loading');
+            const resultArea = document.getElementById('resultArea');
+
+            // UI Reset
+            resultArea.style.display = 'none';
+            loading.style.display = 'block';
+
+            try {
+                const formData = new FormData();
+                formData.append('vehicle_no', vehicleNo);
+
+                const response = await fetch('/get_info', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    // Mapping Data
+                    const o = data.owner_info;
+                    const v = data.vehicle_specs;
+                    const d = data.dates_status;
+                    const ex = data.extra;
+
+                    // Visual Header
+                    document.getElementById('vis_reg').textContent = o.reg_no;
+                    document.getElementById('vis_model').textContent = v.model;
+                    document.getElementById('vis_fuel').textContent = v.fuel;
+
+                    // Cards
+                    document.getElementById('res_owner').textContent = o.owner;
+                    document.getElementById('res_father').textContent = o.father;
+                    document.getElementById('res_rto').textContent = d.rto;
+                    document.getElementById('res_mobile').textContent = o.mobile;
+
+                    document.getElementById('res_maker').textContent = v.maker;
+                    document.getElementById('res_color').textContent = v.color;
+                    document.getElementById('res_engine').textContent = v.engine;
+                    document.getElementById('res_category').textContent = v.category;
+
+                    document.getElementById('res_regdate').textContent = d.reg_date;
+                    document.getElementById('res_status').textContent = d.status;
+                    document.getElementById('res_fitness').textContent = d.fitness;
+                    document.getElementById('res_insurance').textContent = d.insurance;
+                    document.getElementById('res_price').textContent = ex.price;
+
+                    document.getElementById('res_insurer').textContent = ex.insurer;
+                    document.getElementById('res_address').textContent = o.address;
+
+                    // Update Status Color
+                    const statusElem = document.getElementById('res_status');
+                    if(d.status.toLowerCase().includes('active')) {
+                        statusElem.className = 'value status-active';
+                    } else {
+                        statusElem.className = 'value status-inactive';
+                    }
+
+                    // Show Results
+                    setTimeout(() => {
+                        loading.style.display = 'none';
+                        resultArea.style.display = 'block';
+                    }, 800); // Slight delay for smooth animation feel
+
+                } else {
+                    loading.style.display = 'none';
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: data.message,
+                        background: '#1e293b',
+                        color: '#fff'
+                    });
+                }
+
+            } catch (err) {
+                loading.style.display = 'none';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Server Error',
+                    text: 'Unable to connect to the server.',
+                    background: '#1e293b',
+                    color: '#fff'
+                });
+            }
+        }
+    </script>
+</body>
+</html>
